@@ -1,4 +1,7 @@
 # oeawai
+
+![OeAW AI Summer School](header_summerschool.png)
+
 Material of the deep learning track of the ÖAW AI Summer School, v0.2
 
 Open issues:
