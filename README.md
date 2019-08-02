@@ -1,8 +1,6 @@
-# oeawai
-
 ![OeAW AI Summer School](header_summerschool.png)
 
-Material of the deep learning track of the ÖAW AI Summer School, v0.2
+Material of the deep learning track of the ÖAW AI Summer School, v0.2.
 
 Open issues:
  * CNN.ipynb: AttributeError: 'CIFAR10' object has no attribute 'train_labels' (ditto train_data)
