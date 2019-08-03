@@ -4,3 +4,4 @@ torch>=1.0.0
 torchvision>=0.2.0
 sklearn
 matplotlib>=2.1.0
+librosa>=0.7.0
