@@ -1,0 +1,245 @@
+---
+title: " Bayes at ÖAW Summerschool, Ligist"
+author: "Helga Wagner and Tim Foeckersperger"
+date: "`r Sys.Date()`"
+output: bookdown::gitbook
+---
+# Start
+We use R Markdown  which  allows compilation into a html, word document, pdf, etc.
+The first thing to do is to install the R-package *bookdown*.
+
+To run the code below remove the hashtag, copy the command to the console and press Enter.
+```{r}
+# install.packages("bookdown")
+```
+You may also install further packages used in the exercises:
+```{r}
+# install.packages("pscl") 
+# install.packages("invgamma")
+# install.packages("MASS")
+# install.packages("truncnorm")
+# install.packages("rjags")
+# install.packages("coda")
+```
+Next we load the package *bookdown*
+```{r}
+library("bookdown")
+```
+# Introduction to R
+This first chapter is  a short introduction in how to work and code in RStudio for students who have never worked with R and/or need a little recap. Everyone how has already programmed with R and has some experience can either skim over this chapter or entirely skip it and continue with the first Bayesian exercise.
+
+## Basic R description
+R is a free software environment for statistical computing and graphics. It is widely used among statisticians and data miners for data analysis and developing statistical software. RStudio is a free and open-source integrated development environment (IDE) for R. R can be thought of as a big and powerful calculator where commands/equations can directly be executed and a variety of base function is already available/can be downloaded from packages.
+
+NOTE:
+To execute the chunk of code click on the green arrow on the top right side.
+You may also  execute one line by  clicking in or  marking the line and pressing Strg + Enter (On Mac: cmd + Enter):
+
+```{r}
+3 + 4
+3 * 4
+3 / 4
+log(4)
+sqrt(4)
+```
+Other basic functions are: *exp()*, *sin()*, *tanh()*, ... 
+
+## Data structures in R
+R works on named data structures. There are many different  data structures,  e.g. vectors, matrices, lists, data frames, etc.  
+
+To assign such a data structure an arrow *<-* is used (but *=* works as well). 
+
+R allows for different data types, e.g. numeric, character or logical.
+```{r}
+a<-5
+a
+
+b<-"Hello"
+b
+
+c<-TRUE
+c
+```
+The  function *typeof()* returns the type of a variable. 
+Other useful function are:  *abs()*, *round()*, *floor()*, *ceiling()* 
+```{r}
+typeof(c)
+a<- -5.7
+abs(a)
+round(a)
+ceiling(a)
+```
+Vectors can be created  using the function *c()*.
+
+Many functions are  applied elementwise on the vector and return a vector.
+Functions like *sum()*,*prod()*, *min()* and *max()* return only one element. 
+```{r}
+my.first.vector <- c(3,4,6,1)
+my.first.vector
+my.first.vector * 3
+
+my.string <- c("Hello", "World")
+my.string
+
+sum.vec <- sum(my.first.vector)
+sum.vec
+```
+Matrices are created by *matrix()*,  data frames by *data.frame()*  and lists by *list()*.
+
+A list is a vector containing elements of different type.
+
+## Subsetting a vector/ matrix/data.frame...
+Element of a vector, a matrix or a data.frame square brackets are extracted using square brackets.
+```{r}
+my.first.vector[c(1,3)]  # extract the first and third element of the  vector 
+
+mat <- matrix(c(4,3,2,5), nrow = 2) # create a matrix
+mat 
+mat[1,1] # extract the element in the first row, first column
+mat[1,]  # extract the first row
+mat[,1]  # extract the first column
+```
+## Sequences and Replications
+Two important functions  which can be used to create sequences and replications are *seq()* and *rep()*. 
+```{r}
+seq(from = 0.1, to = 2, by = 0.02)
+rep(1:10, times = 3)
+```
+A sequence of  integers can be created using  *:*. 
+```{r}
+1:10
+
+```
+## Help page
+The help page of a function  provides an explanation on how a function works. It can be called by *help()* or by *? \<function name\>*:
+```{r}
+help(sum)
+?rep
+```
+
+## Logical quantities and if...else statements
+The elements of a logical vector can have the values TRUE, FALSE, and NA (for "not available").
+
+Logical operators are <, >, <=, >=, ==, !=, etc. Logical quantities are often used in the context of if...else statements.
+```{r}
+3 > 4
+
+heute <- "Wochenende"
+if (heute == "Wochenende") {
+  print("Gehe ins Freibad")
+} else {
+  print("Gehe zur Arbeit")
+}
+```
+
+## For- /While- Loops
+To write programs in R for/ while loops are important tools. The for-loop is usually run for a certain number of iterations, whereas the while-loop continues until the logical statement is changed to FALSE.
+```{r}
+for(i in 0:10){
+  print(i)
+}
+
+j <- 0
+while(j < 3){
+  print(j)
+  j <- j + 1
+}
+```
+## Plots in R
+There are various ways to create plots in R. A generic function  for plotting R objects is *plot()*. It has several arguments that can be defined to create different types of plots. The most important arguments are:
+
+* x: x coordinates of points
+
+* y: y coordinates of points 
+
+* type: "p" for points, "l" for lines, "b" for both, "h" for a histogram, etc.
+
+* main: title of the plot
+
+* xlab, ylab: titles of the axes
+
+* xlim, ylim: range of x, y axes
+
+* col: color of the plot
+
+For more details see *? plot()*.
+
+The functions *lines()* and *points()* allow  to add lines or points to an existing plot. 
+```{r}
+x1 <- seq(-5, 5, 0.01)
+x2 <- seq(-5, 5, 0.01)
+y1 <- dnorm(x1, mean = 0, sd = 1) #Normal density for every x
+y2 <- dnorm(x2, mean = 0, sd = 1.5) #Normal density for every x
+
+plot(x=x1, y=y1, main = "Normal distribution with different sigma", 
+     type = "l", xlab = "x", ylab = "y", ylim = c(0,0.5), col = "red")
+lines(x2, y2, col = "blue")
+legend("topright", legend = c("sigma = 1", "sigma = 1.5"), col = c("red", "blue"),
+       lty = c(1,1)) # Adds a legend to the plot
+```
+Other important plot functions are: *boxplot()*, *barplot()*, *histogram()*, ...
+
+## Functions for probability distributions
+For many probability distributions 4 different functions
+are implemented in R
+* the probability/density function 
+* the cumulative distribution function 
+* the quantile function 
+* a function for generating random numbers from this distribution.
+
+For the Normal distribution these functions are 
+*dnorm()* (density function), *pnorm()* (cumulative distribution function), *qnorm()* quantile function) and  *rnorm()* (Normal random numbers)
+
+For the Binomial distribution the corresponding functions are *dbinom()*, *pbinom()*,
+*qbinom()* and *rbinom()*.
+```{r}
+qnorm(c(0.9, 0.95,0.99)) # Quantiles of the standard Normal
+
+dbinom(0:5, size=5,prob=0.1) # probability function of the Binomial distribution with n=5 and p=0.1
+
+pbinom(0:5, size=5,prob=0.1) # distribution function function of the Binomial distribution with n=5 and p=0.1
+
+rpois(n=3, lambda=1) # random numbers from a Poisson distribution with parameter lambda=1
+```
+##  Working with matrices
+Matrices are transposed by the function *t()*. 
+```{r}
+A <- matrix(c(4,3,2,5), nrow = 2)
+B <- diag(c(1,2))
+```
+The function "%\*% "  multiplies conformable matrices.  
+```{r}
+A%*%B # multiplication of A and B
+```
+*solve()* computes the inverse of a matrix.
+```{r}
+solve(B) # inverse of B
+```
+
+## Installing packages
+Packages are basically a set of  functions (written by R-users).
+
+A new package can be installed by 
+the function **install.packages("\<package name\>")**.
+```{r, message = FALSE, warning=FALSE, error = FALSE}
+# install.packages("invgamma") #This line is a comment. To run the code remove the hashtag, copy the command to the console and press Enter
+```
+After installing a package  the function **library("\<package name\>")**  makes its functions available in the current R Session.
+
+```{r, message = FALSE, warning=FALSE, error = FALSE}
+# library("invgamma")
+```
+Many functions are provided in the R base package.
+Google / stackoverflow can be useful to find further R functions.
+
+Compiling this file  into a html (or  word document, pdf, etc.) all the code is run again from the beginning  and a nicely formatted file is created. 
+
+To compile the file you just need to press the Knit buttom in the top left corner.
+
+NOTE: Packages need to be pre-installed before the Markdown is compiled. After installing, the command "install.packages()" needs to be converted to a comment (by putting a # in front of it), otherwise an error will occur.
+
+A cheatsheet for basic coding in R can be found here:
+http://github.com/rstudio/cheatsheets/raw/master/base-r.pdf
+
+A cheatsheet for R Markdown can be found here:
+https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf
