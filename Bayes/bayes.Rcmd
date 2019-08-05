@@ -1,5 +1,5 @@
 ---
-title: " Bayes at ÖAW Summerschool, Ligist"
+title: " Bayes at OeAW Summerschool, Ligist"
 author: "Helga Wagner and Tim Foeckersperger"
 date: "`r Sys.Date()`"
 output: bookdown::gitbook
