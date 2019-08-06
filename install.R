@@ -1,1 +1,7 @@
 install.packages("bookdown")
+install.packages("pscl")
+install.packages("invgamma")
+install.packages("MASS")
+install.packages("truncnorm")
+install.packages("rjags")
+install.packages("coda")
