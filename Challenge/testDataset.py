@@ -21,8 +21,14 @@ class TestDataset(data.Dataset):
         assert(isinstance(root, str))
 
         self.root = root
-        self.filenames = glob.glob(os.path.join(root, "audio/*.wav"))           
+        self.filenames = glob.glob(os.path.join(root, "audio/*.wav"))   
+        self.filenames.sort(key=self.file_num)
         self.transform = transform
+            
+    def file_num(self, file_path):
+        file_name = re.compile("\/").split(file_path)[-1]
+        file_num = re.compile("\.").split(file_name)[0]
+        return int(file_num)        
             
     def __len__(self):
         return len(self.filenames)
