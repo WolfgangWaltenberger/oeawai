@@ -1,5 +1,5 @@
 ---
-title: " Bayes at ÖAW Summerschool, Ligist"
+title: " Bayes at OeAW Summerschool, Ligist"
 author: "Helga Wagner and Tim Foeckersperger"
 date: "`r Sys.Date()`"
 output: bookdown::gitbook
@@ -88,8 +88,8 @@ Matrices are created by *matrix()*,  data frames by *data.frame()*  and lists by
 
 A list is a vector containing elements of different type.
 
-## Subsetting a vector/ matrix/data.frame...
-Element of a vector, a matrix or a data.frame square brackets are extracted using square brackets.
+## Subsetting a vector/matrix/data.frame...
+Elements of a vector, a matrix or a data.frame square brackets are extracted using square brackets.
 ```{r}
 my.first.vector[c(1,3)]  # extract the first and third element of the  vector 
 
@@ -105,7 +105,7 @@ Two important functions  which can be used to create sequences and replications 
 seq(from = 0.1, to = 2, by = 0.02)
 rep(1:10, times = 3)
 ```
-A sequence of  integers can be created using  *:*. 
+A sequence of  integers can be created using  *:*
 ```{r}
 1:10
 
@@ -124,11 +124,11 @@ Logical operators are <, >, <=, >=, ==, !=, etc. Logical quantities are often us
 ```{r}
 3 > 4
 
-heute <- "Wochenende"
-if (heute == "Wochenende") {
-  print("Gehe ins Freibad")
+today <- "weekend"
+if (today == "weekend") {
+  print("Jump in the pool")
 } else {
-  print("Gehe zur Arbeit")
+  print("Go to work")
 }
 ```
 
@@ -177,18 +177,20 @@ lines(x2, y2, col = "blue")
 legend("topright", legend = c("sigma = 1", "sigma = 1.5"), col = c("red", "blue"),
        lty = c(1,1)) # Adds a legend to the plot
 ```
+
 Other important plot functions are: *boxplot()*, *barplot()*, *histogram()*, ...
 
 ## Functions for probability distributions
 For many probability distributions 4 different functions
 are implemented in R
-* the probability/density function 
-* the cumulative distribution function 
-* the quantile function 
-* a function for generating random numbers from this distribution.
+
+  * the probability/density function 
+  * the cumulative distribution function 
+  * the quantile function 
+  * a function for generating random numbers from this distribution.
 
 For the Normal distribution these functions are 
-*dnorm()* (density function), *pnorm()* (cumulative distribution function), *qnorm()* quantile function) and  *rnorm()* (Normal random numbers)
+*dnorm()* (density function), *pnorm()* (cumulative distribution function), *qnorm()* (quantile function) and  *rnorm()* (Normal random numbers)
 
 For the Binomial distribution the corresponding functions are *dbinom()*, *pbinom()*,
 *qbinom()* and *rbinom()*.
@@ -206,10 +208,12 @@ Matrices are transposed by the function *t()*.
 ```{r}
 A <- matrix(c(4,3,2,5), nrow = 2)
 B <- diag(c(1,2))
+
+A;t(A)
 ```
 The function "%\*% "  multiplies conformable matrices.  
 ```{r}
-A%*%B # multiplication of A and B
+A %*% B # multiplication of A and B
 ```
 *solve()* computes the inverse of a matrix.
 ```{r}

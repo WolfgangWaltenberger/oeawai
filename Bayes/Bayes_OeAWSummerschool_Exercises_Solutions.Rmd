@@ -4,6 +4,23 @@ author: "Helga Wagner, Tim Foeckersperger"
 date: "`r Sys.Date()`"
 output: bookdown::gitbook
 ---
+# Necessary packages and programs
+In order to run the following code, make sure you have installed the following R packages:
+
+```{r}
+# install.packages("bookdown")
+# install.packages("pscl") 
+# install.packages("invgamma")
+# install.packages("MASS")
+# install.packages("truncnorm")
+# install.packages("rjags")
+# install.packages("coda")
+```
+
+Further, for exercise 8 download JAGS from https://sourceforge.net/projects/mcmc-jags/ and install it. Otherwise, an error will be thrown.
+
+
+
 # Short recap
 Bayesian statistics is about updating prior beliefs once some data are seen. The prior uncertainty or prior knowledge is quantified through the prior distribution. Bayesian theorem states that the  (non-normalized) posterior distribution which is used for statistical inference can be derived as:
 $$\Large p(\theta|y) \propto p(y|\theta) p(\theta)$$
@@ -18,7 +35,7 @@ Thus, Bayes theorem describes how uncertainty on the parameter is changed by the
 # Conjugate analysis
 ## Exercise 1:  Rare disease - Posterior inference for the  Binomial model 
 
-Suppose we are interested in the prevalence $\theta$ of a rare disease $\theta \in  \Theta  = [0,1]$. n people were checked for infection and y is the number of infected in the sample (Y|$\large \theta \sim BiNom(n,\theta))$. The prior distribution for $\theta$ is a Beta distribution $B(a, b)$.
+Suppose we are interested in the prevalence $\theta$ of a rare disease $\theta \in  \Theta  = [0,1]$. n people were checked for infection and y is the number of infected in the sample (Y|$\theta \sim BiNom(n,\theta))$. The prior distribution for $\theta$ is a Beta distribution $B(a, b)$.
 
 1) Plot the probability function of y for $\theta$ = 0.02, 0.1, 0.2 and n = 20 (in one plot). 
 
@@ -42,6 +59,7 @@ lines(y + 0.1, fy0.2, type = "h", col = "green")
 legend("topright", legend = c("theta = 0.02", "theta = 0.1", "theta = 0.2"),
        col = c("red", "blue", "green"), lty = c(1,1,1))
 ```
+
 2) Plot the prior and posterior distribution of $\theta$ for n = 20 and y = 0. Consider two scenarios with different hyperparameters (a1 and b1 for Scenario 1, a2 and b2 for Scenario 2) for the prior distribution of $\theta$:
 
 * a1 = b1 = 1     (i.e. $\theta_1 \sim B(a_1, b_1)$)
@@ -62,8 +80,8 @@ theta <- seq(0, 1, by = 0.001)
 a1 <- 1
 b1 <- 1
 
-a1n <- a1+y
-b1n <- b1+n-y
+a1n <- a1 + y
+b1n <- b1 + n - y
 
 p.theta.prior1 <- dbeta(theta, shape1 = a1, shape2 = b1)
 p.theta.posterior1 <- dbeta(theta, shape1 = a1n, shape2 = b1n)
@@ -79,8 +97,8 @@ legend("topright", legend = c("Prior", "Posterior"),
 a2 <- 2
 b2 <- 20
 
-a2n <- a2+y
-b2n <- b2+n-y
+a2n <- a2 + y
+b2n <- b2 + n - y
 p.theta.prior2 <- dbeta(theta, shape1 = a2, shape2 = b2)
 p.theta.posterior2 <- dbeta(theta, shape1 = a2n, shape2 = b2n)
 
@@ -99,12 +117,12 @@ legend("topright", legend = c("Prior", "Posterior"),
 
 4) For n = 20 compute $E(\theta|y = 0)$, mode($\theta$|y = 0), sd($\theta$|y = 0) and P($\theta$ < 0.1|y = 0) for a = b = 1 and a = 2, b = 20.
 
-$$E(\theta|y = 0) = \frac{a}{a+b}$$
+$$E(\theta|y = 0) = \frac{a_n}{a_n+b_n}$$
 
 
-$$Mode(\theta|y = 0) = \frac{a-1}{a+b-2} \text{ for a, b > 1} $$ 
+$$Mode(\theta|y = 0) = \frac{a_n-1}{a_n+b_n-2} \text{ for } a_n, b_n > 1 $$ 
 
-$$sd(\theta|y = 0) = \sqrt{\frac{ab}{(a+b+1) (a+b)^2} }$$
+$$sd(\theta|y = 0) = \sqrt{\frac{a_n b_n}{(a_n+b_n+1) (a_n+b_n)^2} }$$
 
 ```{r}
 n <- 20
@@ -138,11 +156,12 @@ post.sd <-  sqrt((an*bn)/((an+bn+1)*(an+bn)^2)) #posterior sd
 post.p <- pbeta(0.1, an, bn) # posterior probability  p(theta < 0.1| Y = 0)
 (data.frame(post.exp, post.mode, post.sd, post.p))
 ```
-5) Compute an equally tailed and an HPD 95% credibility interval for the parameter $\theta$ in the second scenario and compare the length of these credibility intervals. 
+5) Compute an equally tailed and an HPD (highest posterior density) 95%-credibility interval for the parameter $\theta$ in the second scenario and compare the length of these credibility intervals. 
 
 HINT: 
 Use  quantiles of the beta distribution  for the equal tailed intervall;   
-for the HPD, you can use the function *betaHPD* (R package  *pscl*)
+for the HPD-interval with a Beta posterior, you can use the function *betaHPD* 
+(in R package  *pscl*)
 
 ```{r cars}
 library("pscl")
@@ -174,7 +193,7 @@ diff(CI2)
 ## Exercise 2: Children data -  Posterior inference for the Poisson model 
 The file "children.RData" contains information of how many pedestrians (6-10 years old) were killed or seriously injured in an Austrian city over the time of 16 years.
 As the data are count data we assume that the number  Y of children killed or seriously
-injured follows a Poisson distribution with parameter $\lambda$: $$Y|\lambda \sim Poisson(\lambda).$$ The conjugate prior for a Poisson likelihood is a Gamma distribution with hyperparameters a and b $\mathcal{G}(a_0,b_0)$.
+injured follows a Poisson distribution with parameter $\lambda$: $$Y|\lambda \sim Poisson(\lambda).$$ The conjugate prior for a Poisson likelihood is a Gamma distribution with hyperparameters a and b $\mathcal{G}(a_0,b_0)$, thus use $\lambda \sim \mathcal{G}(a_0,b_0)$
 
 1) Load the data "children.RData" running the command below.
 ```{r}
@@ -226,9 +245,13 @@ legend("topright", legend = c("Prior", "Posterior"),
 $$Y_i \sim P (\lambda_1) \text{ for i } \leq \text{93}$$
 $$Y_i \sim P (\lambda_2) \text{ for i > 94}$$
 ```{r}
+# legal amendment => ev.  structural break after month 9 in year 8 
 struct.break <- as.numeric(row.names(children[children$months == 9 &
                                                 children$year == 8,]))
+# data before legal amendment
 child.before <- children[1:struct.break,]
+
+# data after legal amendment
 child.after <- children[(struct.break+1):nrow(children),]
 ```
 If $\lambda_1$ and $\lambda_2$ are a priori independent
@@ -260,8 +283,8 @@ b2 <- 1
 y2.mean <- mean(child.after[,1])
 n2 <- nrow(child.after)
 
-a.2n <- a2+n2 * y2.mean
-b.2n <- b2+n2
+a.2n <- a2 + n2 * y2.mean
+b.2n <- b2 + n2
 
 # Plot posterior
 lam <- seq(0,4,0.001)
@@ -276,6 +299,7 @@ legend("topright", legend = c("Before the structural break",
                               "After the structural break"),
        col = c("red", "darkred"), lty = c(1,1))
 ```
+
 5) What can you conclude  about  the effect of the legal amendment?
 
 ## Exercise 3: Midge data - Normal model with known variance
@@ -290,7 +314,8 @@ RECALL:
 When $y_1, ..., y_n$ iid. $N(\mu, \sigma^2)$ with a Normal prior on $\mu$,  $\mu \sim N(m_0, M_0)$ and known $\sigma^2$ > 0 the posterior distribution of $\mu$ is also a Normal distribution $N(m_n, M_n)$ with  parameters $M_n$ and $m_n$ given as:
 $$M_n = (\frac{1}{M_0} + \frac{n}{\sigma^2})^{-1}.$$
 and 
-$$m_n = M_n  (\frac{m_0}{M_0} + \frac{n}{\sigma^2}{\bar{y}})$$
+$$m_n = M_n  (\frac{m_0}{M_0} + \frac{n}{\sigma^2}{\bar{y}}),$$
+see slide 44.
 
 1) Compute the posterior mean $m_n$ and  the posterior variance $M_n$ of $\mu$ for $m_0 = 0$ and $M_0 = 10000$. 
 ```{r}
@@ -347,8 +372,10 @@ If both parameters of the Normal distribution $\mu$ and $\sigma^2$ are unknown a
 A conjugate prior is specified as follows: The prior on $\mu$ conditional on $\sigma^2$  is Normal,
 $$\mu|\sigma^2  \sim N(m_0, \sigma^2 M_0)$$
 and the (marginal) prior of $\sigma^2$ is the inverse Gamma distribution 
-$$\sigma^2  \sim G^{-1}(\nu_0/2, \nu_0/2 \, \sigma_0^2)$$
-1) Write a  program to sample from the joint prior distribution of $\mu$ and $\sigma^2$ by sampling from the distributions $p(\mu|\sigma^2,\mathbf{y})$ and $p(\sigma^2|\mathbf{y})$ 
+$$\sigma^2  \sim G^{-1}(\nu_0/2, \nu_0/2 \, \sigma_0^2),$$
+see slide 49.
+
+1) Write a  program to sample from the joint prior distribution of $\mu$ and $\sigma^2$ by sampling from the distributions $p(\mu|\sigma^2)$ and $p(\sigma^2)$ 
 
 Set the prior parameters  first to $m_0=1.9$,$M_0=1$, $\nu_0=1$ and $\sigma^2_0=0.01$ and plot the draws (you might want to "zoom in" when you do the plot by setting xlim and ylim in a proper way).
 
@@ -365,10 +392,6 @@ nu.0 <- 1; sigma2.0 <-0.01
 # set number of draws 
 nsim <- 10000 
 
-#  create empty vectors for the draws
-sigma2.draws <- rep(NA,nsim)
-mu.draws <- rep(NA,nsim)
-
 # generate draws
 sigma2.draws <- rinvgamma(nsim, nu.0/2, nu.0/2*sigma2.0)
 mu.draws <- rnorm(nsim, mean = m0, sd = sqrt(1*sigma2.draws))
@@ -380,7 +403,7 @@ plot(mu.draws, sigma2.draws)
 plot(mu.draws, sigma2.draws, xlim=c(-6,6), ylim=c(0,50))
 ```
 
-2) Write a programm  to sample from the posterior distribution by sampling $\sigma^2$  from $p(\sigma^2|\mathbf{y})$  and $\mu$ from $p(\mu|\sigma^2,\mathbf{y})$. 
+2) Write a program  to sample from the posterior distribution by sampling $\sigma^2$  from $p(\sigma^2|\mathbf{y})$  and $\mu$ from $p(\mu|\sigma^2,\mathbf{y})$. 
 
 
 RECALL: 
@@ -389,7 +412,7 @@ $$\sigma^2 | \textbf{y} \sim G^{-1}(\frac{\nu_n}{2}, \frac{\nu_n}{2} \sigma^2_n)
 and the conditional posterior of $\mu$ is Normal
 $$\mu| \sigma^2, \textbf{y} \sim N(m_n, M_n \sigma^2)$$
 
-Formulas for the posterior parameters $\nu_n, \sigma^2_n, m_n, M_n$ are given on slide 49. 
+Formulas for the posterior parameters $\nu_n, \sigma^2_n, m_n, M_n$ are given on slide 51. 
 
 
 HOW TO PROCEED:
@@ -402,9 +425,9 @@ HOW TO PROCEED:
 
 * Determine the posterior parameters  
 
-* Sample $nsim$ values from $p(\sigma^2|\mathbf{y})$ 
+* Sample $M$ values from $p(\sigma^2|\mathbf{y})$ 
 
-* Sample $nsim$ values from $p(\mu|\sigma^2,\mathbf{y})$ using the sampled values of  $\sigma^2$
+* Sample $M$ values from $p(\mu|\sigma^2,\mathbf{y})$ using the sampled values of  $\sigma^2$
 
 
 ```{r}
@@ -420,11 +443,6 @@ nu.0 <- 1; sigma2.0 <-0.01
 
 # set number of draws
 M <- 10000 
-
-# create empty vectors for the draws
-mu.draws <- rep(NA, nsim)
-sigma2.draws <- rep(NA,nsim)
-
 
 # sample sigma2
 nu.n <- nu.0 + n
@@ -445,26 +463,30 @@ mu.draws <- rnorm(M, mean = mn, sd = sqrt(sigma2.draws * Mn))
 plot(mu.draws, sigma2.draws,xlab="mu",ylab="sigma2")
 ```
 
-4) Use the draws from the posterior to approximate the posterior mean and variance of the parameters $\mu$ and $\sigma^2$. Plot the approximation of the marginal posterior of the mean wing length. 
+4) Use the draws from the posterior to approximate the posterior mean and variance of the parameters $\mu$ and $\sigma^2$.
 
-Advanced task: Perform a sensitivity analysis to investigate how the results change  with the prior parameters.
 ```{r}
 mean(mu.draws)
 var(mu.draws)
 
 mean(sigma2.draws)
 var(sigma2.draws)
-
+```
+5) Plot the approximation of the marginal posterior of the mean wing length. 
+```{r}
 plot(density(mu.draws),xlab="mu",ylab="pdf", main="Marginal posterior of mu") 
 ```
 
+Advanced task: Perform a sensitivity analysis to investigate how the results change  with the prior parameters.
+
+
 # MCMC methods
 
-## Exercise 5: Gibbs sampling -  Linear regression analysis for the  Oxygen uptake data-  with Gibbs sampling 
+## Exercise 5: Gibbs sampling -  Linear regression analysis for the  Oxygen uptake data
 
 Fit a Bayesian linear regression model to the oxygen uptake data.
 
-The available data for this analysis contains measurements on oxygen uptake from twelve healthy men  under two different exercise regimen (aerobic/running) .
+The available data for this analysis contains measurements on oxygen uptake from twelve healthy men  under two different exercise regimen (aerobic/running).
 As covariates the exercise regime (1=aerobic, 0=running), the age and the interaction between the group and the age are considered.
 
 To load the data run the following chunk:
@@ -479,7 +501,7 @@ data
 ```
 For the analysis use a  semi-conjugate prior 
 $$p(\boldsymbol{\beta}, \sigma^2)=p(\boldsymbol{\beta})p(\sigma^2)$$
-where 
+where
 
 $$\boldsymbol{\beta} \sim N_d(\mathbf{b_0}, \mathbf{B_0})$$
 and 
@@ -520,14 +542,12 @@ y <- cbind(as.matrix(data[,1]))
 n <- length(y)
 k <- dim(X)[2]
 
-
 # set prior parameters
 b0 <- rep(0,k)
 B0 <- 10^6 * diag(k)
 
 s0 <- 1
 S0 <- 12
-
 
 #  set number of iterations for the Gibbs sampler
 M <- 6000 
@@ -539,7 +559,6 @@ sigma2.draws <- rep(NA,M)
 # compute necessary quantities for the Gibbs sampler
 XX <- t(X) %*% X
 Xy <- t(X) %*% y
-
 
 iB0 <- solve(B0)
 iB0.b0 <- iB0%*%b0
@@ -639,7 +658,7 @@ as
 $$P(y_i = 1) = \Phi(\mathbf{x}_i'\boldsymbol{\beta})$$
 In a Bayesian probit model the prior distribution of $\boldsymbol{\beta}$ is (usually) specified as a multivariate Normal distribution 
 $$\beta \sim N(\mathbf{b}_0,\mathbf{B}_0)$$
-Posterior inference can be performed by  Gibbs sampling with data augmentation, see slides 80ff. 
+Posterior inference can be performed by  Gibbs sampling with data augmentation, see slides 91ff. 
 
 1) Load the data and perform a short descriptive analysis.
 
@@ -659,12 +678,11 @@ summary(Pima.tr)
 
 * Define the vector of binary responses $y$ where $y=1$, if "type=Yes" and $y=0$ otherwise and determine the number of observations "n" .
 
-* Center the covariates glu, bp, skin, bmi, ped and age at sensible reference values (e.g. those on slide 92) 
+* Center the covariates glu, bp, skin, bmi, ped and age at sensible reference values (e.g. those on slide 93) 
 
 * Generate a vector "int" of length "n" with element 1 (for the intercept in the regression model) .
 
-* Collect the vector "int" and  the centerd covariates in a matrix $X$ and  determine  "k" as the number of columns in the matrix $X$,
- (i.e. the number of regression effects+intercept ).
+* Collect the vector "int" and  the centered covariates in a matrix $X$ and  determine  "k" as the number of columns in the matrix $X$ (i.e. the number of regression effects+intercept ).
 ```{r}
 y <- as.numeric(Pima.tr$type)-1
 n <- length(y)
@@ -797,7 +815,6 @@ effectiveSize(beta.draws[keep,])
 ```
 
 5) Keep every 10th draw after burnin for posterior analysis:
-
   * Plot kernel density estimates for the posterior of each regression effect.
   * Compute approximations for the mean, the standard deviation and the 95% posterior interval. 
 ```{r}
@@ -847,11 +864,12 @@ res
 1) Write a program to sample from the $t_3$ -distribution i.e. the Student-distribution with 3 degrees of freedom using the independence MH-sampler with 
 
   * the Cauchy-distribution (with location 0 and scale 1)
+  
   * the standard normal distribution
 
 as proposal densities.
 
-Computer the number of accepted proposals.
+Compute the number of accepted proposals.
 
 
 HINTS:
@@ -965,17 +983,16 @@ for (i in (1:2)){
 print(eSS)
 print(acc.rate)
 ```
-3) Compare the probability for a value larger than 4 of the $t_3$ to the corresponding relative
-frequency in the generated sample. 
+3) Compare the probability for a value larger than 4 of the $t_3$ to the corresponding relative frequency in the generated sample. 
 ```{r}
 x <- 4
 (prob<- data.frame(cbind(ptrue=pt(x,df=df.t), p_propNormal=sum(res1[[1]]<=x)/M,p_propCauchy=sum(res2[[1]]<=x)/M)))
 
 ```
 
-## Exercise 8: Metropolis-Hastings sampling: Logit model for the Pima indian data
+## Exercise 8: Logit model for the Pima indian data with rjags 
 
-Fit a Bayesian probit model to the Pima indian data "Pima.tr" in R-package MASS.
+Fit a Bayesian logit model to the Pima indian data "Pima.tr" in R-package MASS.
 
 RECALL: 
 For binary observations $y_i$ and regressor vector $\mathbf{x}_i$, $i=1,\dots,n$ the logit model specifies $P(y_i=1)$ as
@@ -984,10 +1001,11 @@ This model for the data is (usually) complemented by the prior
 $$\boldsymbol{\beta} \sim N(\mathbf{b_0},\mathbf{B_0})$$
  and the resulting posterior is not of closed form.
  
-Many R packages with different functionalities have been implemented and are available in R for posterior sampling. 
+For many problems R packages with different functionalities have been implemented, also  for posterior sampling. 
 
-One very useful package for MCMC sampling is   *rjags*  which provides a convenient interface for performing Bayesian analysis in R with  JAGS. JAGS stands for "Just Another Gibbs Sampler". rjags has the big advantage that it makes statistical analysis of Bayesian hierarchical models by Markov Chain Monte Carlo quite easy. 
+One very useful package for MCMC sampling is  *rjags*  which provides a convenient interface for performing Bayesian analysis in R with  JAGS. JAGS stands for "Just Another Gibbs Sampler". rjags has the big advantage that it makes statistical analysis of Bayesian hierarchical models by Markov Chain Monte Carlo quite easy. 
 
+NOTE:
 You first have to download JAGS from https://sourceforge.net/projects/mcmc-jags/ and install it.
 
 To fit a logit model with JAGS, first we load the package and prepare the data as in the probit model.
@@ -1024,7 +1042,7 @@ In regression models where  observations are conditionally independent given the
 In the logit model each $y_i$ is assumed to follow  a Bernoulli distribution with a specfic parameter $\pi_i$ and the  $\pi_i$ is linked to  the linear predictor $\mathbf{x_i}' \boldsymbol {\beta}$ by  the logit link function. 
 
 Independent Normal prior distributions of the regression parameters can be specified  in a second loop, however in the BUGs language the parameters of the Normal distribution are not mean
-$\mu$ and  standard deviation $\sigma$  as in R  but  mean $\mu$ and the precision $\tau=1/\sigma^2)$.
+$\mu$ and  standard deviation $\sigma$  as in R  but  mean $\mu$ and precision $\tau=1/\sigma^2)$.
 ```{r}
 require(rjags)
 
@@ -1056,17 +1074,20 @@ inits <- list(.RNG.name = "base::Mersenne-Twister",
 model <- jags.model(model, data = data, inits = inits)
 ```
 
-The model is  then updated for the  burnin period  and  the function *coda.sample(...)*  with  arguments "model", "variable.names", "n.iter" and "thin" is called to generate samples from the posterior. "variable.names" defines the names of the  variables to be sampled.
+The model is  then updated for the  burnin period. 
 ```{r}
 # update the model- this constitutes the burnin phase
 update(model, n.iter = 1000)
+```
 
+Then the function *coda.sample(...)*  with  arguments "model", "variable.names", "n.iter" and "thin" is called to generate samples from the posterior. "variable.names" defines the names of the  variables to be sampled.
+```{r}
 # generate MCMC samples 
 samples <- coda.samples(model, variable.names = "beta", 
                         n.iter = 10000, thin = 10)
 ```
 
-The function coda.samples returns a list, where the first argument is a matrix containing in the rows the  MCMC draws of one sampling step. 
+The function coda.samples returns a list, where the first argument is a matrix where  columns contain the    MCMC draws of one  parameter. 
 ```{r}
 beta.draws <-samples[[1]]
 ```
@@ -1101,7 +1122,7 @@ library(coda)
 effectiveSize(beta.draws)
 ```
 
-Autocorrelation of the draws can be reduced by specifying a higher thining interval. As higher thinning reduces the sample size also the number of iterations should then be increased.You can run the function coda.samples again with a higher number of iterations (e.g. 100000) and a higher thinning factor (e.g. 100)  and then inspect the autocorrelations.  
+Autocorrelation of the draws can be reduced by specifying a higher thinning interval. As higher thinning reduces the sample size also the number of iterations should then be increased.You can run the function coda.samples again with a higher number of iterations (e.g. 100000) and a higher thinning factor (e.g. 100)  and then inspect the autocorrelations.  
 
 WARNING: To execute the following chunk, uncomment it. Execution can take up to 3-4 minutes.
 ```{r}
@@ -1121,8 +1142,6 @@ WARNING: To execute the following chunk, uncomment it. Execution can take up to 
 # acf(beta.draws[,8])
 # 
 # effectiveSize(beta.draws)
-# 
-
 ```
 
 c) Fit a  (frequentist) Logit model using glm(y~X-1, family = binomial()) and compare the results.
